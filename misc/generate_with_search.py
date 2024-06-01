@@ -157,19 +157,7 @@ def generate_image(
     cfg, save_folder, image_list, device, random_img_list=None, batch_size: int = 64
 ):
     torch.cuda.set_device(device)
-    if args.add_noise_step == 0:
-        inverse_scheduler = INVERSE_SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](
-            num_train_timesteps=cfg.TRAIN.SAMPLE_STEPS,
-            prediction_type=cfg.TRAIN.NOISE_SCHEDULER.PRED_TYPE,
-            beta_schedule=cfg.TRAIN.NOISE_SCHEDULER.TYPE,
-            # For linear only
-            beta_start=cfg.TRAIN.NOISE_SCHEDULER.BETA_START,
-            beta_end=cfg.TRAIN.NOISE_SCHEDULER.BETA_END,
-            thresholding=True,
-            lambda_min_clipped=-5.1,
-        )
-
-    noise_scheduler = SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](
+    kwargs = dict(
         num_train_timesteps=cfg.TRAIN.SAMPLE_STEPS,
         prediction_type=cfg.TRAIN.NOISE_SCHEDULER.PRED_TYPE,
         beta_schedule=cfg.TRAIN.NOISE_SCHEDULER.TYPE,
@@ -177,8 +165,14 @@ def generate_image(
         beta_start=cfg.TRAIN.NOISE_SCHEDULER.BETA_START,
         beta_end=cfg.TRAIN.NOISE_SCHEDULER.BETA_END,
         thresholding=True,
-        lambda_min_clipped=-5.1,
     )
+    if cfg.EVAL.SCHEDULER == "dpm":
+        kwargs["lambda_min_clipped"] = -5.1
+
+    if args.add_noise_step == 0:
+        inverse_scheduler = INVERSE_SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](**kwargs)
+
+    noise_scheduler = SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](**kwargs)
     model = build_model(cfg, use_free_U=False).to(device)
 
     img_transforms = T.Compose(

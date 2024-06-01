@@ -82,25 +82,25 @@ accelerate launch --multi_gpu --num_processes={NUM_OF_GPU} main.py --config conf
 
 ```shell
 python misc/generate_cond.py --cond-root {PATH/TO/TEST/LABEL} --save-folder {PLACE/FOR/OUTPUT} --config configs/default.yaml \
-    --batch-size {NUM_BATCH_SIZE} --num-process {NUM_PROCESS} --opts EVAL.CHECKPOINT {PATH/TO/CHECKPOINT}
+    --batch-size {NUM_BATCH_SIZE} --num-process {NUM_PROCESS} --opts EVAL.CHECKPOINT {PATH/TO/CHECKPOINT} EVAL.SCHEDULER ddpm EVAL.SAMPLE_STEPS 1000
 
 # Concrete example
 python misc/generate_cond.py --cond-root data/test_label --save-folder generate_out --config configs/default.yaml \
-    --batch-size 8 --num-process 4 --opts EVAL.CHECKPOINT best.pth
+    --batch-size 8 --num-process 4 --opts EVAL.CHECKPOINT best.pth EVAL.SCHEDULER ddpm EVAL.SAMPLE_STEPS 1000
 ```
 
 ### B.3 Generating with RAG
 
 ```shell
 python misc/generate_with_search.py --use-ssim --cond-root {PATH/TO/TEST/LABEL} --save-folder {PLACE/FOR/OUTPUT} --config configs/default.yaml \
-    --batch-size {NUM_BATCH_SIZE} --num-process {NUM_PROCESS} --opts EVAL.CHECKPOINT {PATH/TO/CHECKPOINT}
+    --batch-size {NUM_BATCH_SIZE} --num-process {NUM_PROCESS} --opts EVAL.CHECKPOINT {PATH/TO/CHECKPOINT} EVAL.SCHEDULER dpm EVAL.SAMPLE_STEPS 300 EVAL.GUIDANCE 1.5
 
 # Concrete example
 python misc/generate_with_search.py --use-ssim --cond-root data/test_label/ --save-folder generate_out --config configs/default.yaml \
-    --batch-size 8 --num-process 4 --opts EVAL.CHECKPOINT best.pth
+    --batch-size 8 --num-process 4 --opts EVAL.CHECKPOINT best.pth EVAL.SCHEDULER dpm EVAL.SAMPLE_STEPS 300 EVAL.GUIDANCE 1.5
 ```
 
-### B.4 Generating with random RAG
+### B.4 Generating with random search
 
 ```shell
 python misc/generate_with_search.py --add-noise-step {STEP/FOR/BACKWARD} --cond-root {PATH/TO/TEST/LABEL} --save-folder {PLACE/FOR/OUTPUT} --config configs/default.yaml \

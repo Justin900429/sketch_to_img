@@ -81,7 +81,7 @@ def evaluate(cfg, model, noise_scheduler, conditional_imgs, labels, device, num_
 
 
 def generate_image(cfg, save_folder, image_list, device, batch_size: int = 64):
-    noise_scheduler = SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](
+    kwargs = dict(
         num_train_timesteps=cfg.TRAIN.SAMPLE_STEPS,
         prediction_type=cfg.TRAIN.NOISE_SCHEDULER.PRED_TYPE,
         beta_schedule=cfg.TRAIN.NOISE_SCHEDULER.TYPE,
@@ -90,6 +90,9 @@ def generate_image(cfg, save_folder, image_list, device, batch_size: int = 64):
         beta_end=cfg.TRAIN.NOISE_SCHEDULER.BETA_END,
         thresholding=True,
     )
+    if cfg.EVAL.SCHEDULER == "dpm":
+        kwargs["lambda_min_clipped"] = -5.1
+    noise_scheduler = SCHEDULER_FUNC[cfg.EVAL.SCHEDULER](**kwargs)
     model = build_model(cfg, train=False)
     model.to(device)
 
